@@ -22,7 +22,8 @@ class TodoSaver
   end
 
   def list
-    List.retrieve(@list_name.downcase)
+    List.retrieve(@list_name.downcase) ||
+      List.create(@list_name)
   end
 end
 
@@ -48,6 +49,15 @@ describe TodoSaver do
       list = mock
       saver = TodoSaver.new('WriTing', mock)
       List.stub(:retrieve).with('writing').and_return(list)
+
+      expect(saver.list).to eq list
+    end
+
+    it 'creates a new list if no previous list was found' do
+      list = mock
+      saver = TodoSaver.new('WriTing', mock)
+      List.stub(:retrieve).with('writing').and_return(nil)
+      List.stub(:create).with('WriTing').and_return(list)
 
       expect(saver.list).to eq list
     end
