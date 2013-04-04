@@ -4,6 +4,9 @@ require 'rspec/autorun'
 class TodoItem
 end
 
+class List
+end
+
 ####
 
 
@@ -16,6 +19,10 @@ class TodoSaver
   def save
     todo = TodoItem.create(@todo_text)
     list.add todo
+  end
+
+  def list
+    List.retrieve(@list_name.downcase)
   end
 end
 
@@ -35,6 +42,14 @@ describe TodoSaver do
       saver.save()
     end
   end
+
   describe '.list' do
+    it 'retrieves an existing list by its normalized name' do
+      list = mock
+      saver = TodoSaver.new('WriTing', mock)
+      List.stub(:retrieve).with('writing').and_return(list)
+
+      expect(saver.list).to eq list
+    end
   end
 end
