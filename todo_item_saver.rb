@@ -29,37 +29,38 @@ end
 
 describe TodoSaver do
   describe '#save' do
-    it "creates the todo and adds it to a list" do
-      list, todo = mock, mock
+    context "the list to save it to exists" do
+      it "creates the todo and adds it to a list" do
+        list, todo = mock, mock
 
-      saver = TodoSaver.new('Writing', 'write blogpost')
+        saver = TodoSaver.new('WriTing', 'write blogpost')
 
-      TodoItem.should_receive(:create).with('write blogpost')
-              .and_return(todo)
+        TodoItem.should_receive(:create).with('write blogpost')
+                .and_return(todo)
 
-      saver.stub list: list
-      list.should_receive(:add).with(todo)
+        List.stub(:retrieve).with('writing').and_return(list)
 
-      saver.save()
+        list.should_receive(:add).with(todo)
+
+        saver.save()
+      end
     end
-  end
+    context "the list to save it to does not exist" do
+      it "creates the todo and adds it to a list" do
+        list, todo = mock, mock
 
-  describe '.list' do
-    it 'retrieves an existing list by its normalized name' do
-      list = mock
-      saver = TodoSaver.new('WriTing', mock)
-      List.stub(:retrieve).with('writing').and_return(list)
+        saver = TodoSaver.new('WriTing', 'write blogpost')
 
-      expect(saver.list).to eq list
-    end
+        TodoItem.should_receive(:create).with('write blogpost')
+                .and_return(todo)
 
-    it 'creates a new list if no previous list was found' do
-      list = mock
-      saver = TodoSaver.new('WriTing', mock)
-      List.stub(:retrieve).with('writing').and_return(nil)
-      List.stub(:create).with('WriTing').and_return(list)
+        List.stub(:retrieve).with('writing').and_return(nil)
+        List.stub(:create).with('WriTing').and_return(list)
 
-      expect(saver.list).to eq list
+        list.should_receive(:add).with(todo)
+
+        saver.save()
+      end
     end
   end
 end
